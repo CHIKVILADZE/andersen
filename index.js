@@ -131,76 +131,140 @@
 
 // Task 1
 
-class Calculator {
-  constructor(x, y) {
-    this.validateNumber(x);
-    this.validateNumber(y);
-    this.x = x;
-    this.y = y;
+// class Calculator {
+//   constructor(x, y) {
+//     this.validateNumber(x);
+//     this.validateNumber(y);
+//     this.x = x;
+//     this.y = y;
 
-    this.logSum = this.logSum.bind(this);
-    this.logMul = this.logMul.bind(this);
-    this.logSub = this.logSub.bind(this);
-    this.logDiv = this.logDiv.bind(this);
-  }
+//     this.logSum = this.logSum.bind(this);
+//     this.logMul = this.logMul.bind(this);
+//     this.logSub = this.logSub.bind(this);
+//     this.logDiv = this.logDiv.bind(this);
+//   }
 
-  validateNumber(num) {
-    if (typeof num !== "number" || !isFinite(num)) {
-      throw new Error("Invalid number");
+//   validateNumber(num) {
+//     if (typeof num !== "number" || !isFinite(num)) {
+//       throw new Error("Invalid number");
+//     }
+//   }
+
+//   setX(x) {
+//     this.validateNumber(x);
+//     this.x = x;
+//   }
+
+//   setY(y) {
+//     this.validateNumber(y);
+//     this.y = y;
+//   }
+
+//   logSum() {
+//     return this.x + this.y;
+//   }
+
+//   logMul() {
+//     return this.x * this.y;
+//   }
+
+//   logSub() {
+//     return this.x - this.y;
+//   }
+
+//   logDiv() {
+//     if (this.y === 0) {
+//       throw new Error("Division by zero is incorrect");
+//     }
+//     return this.x / this.y;
+//   }
+// }
+// try {
+//   const calculator = new Calculator(10, "a");
+
+//   const logSumRef = calculator.logSum;
+//   console.log(logSumRef());
+
+//   const logMulRef = calculator.logMul;
+//   console.log(logMulRef());
+
+//   const logSubRef = calculator.logSub;
+//   console.log(logSubRef());
+
+//   const logDivRef = calculator.logDiv;
+//   console.log(logDivRef());
+
+//   calculator.setX(20);
+//   calculator.setY(4);
+
+//   console.log(logSumRef());
+//   console.log(logMulRef());
+//   console.log(logSubRef());
+//   console.log(logDivRef());
+// } catch (error) {
+//   console.error(error.message);
+// }
+
+// Lecture 5 (OOP in JS)
+
+class Stack {
+  constructor(maxSize = 10) {
+    if (typeof maxSize !== "number" || maxSize <= 0) {
+      throw new Error("Max size must be a positive number.");
     }
+    this.maxSize = maxSize;
+    this.stack = [];
   }
 
-  setX(x) {
-    this.validateNumber(x);
-    this.x = x;
-  }
-
-  setY(y) {
-    this.validateNumber(y);
-    this.y = y;
-  }
-
-  logSum() {
-    return this.x + this.y;
-  }
-
-  logMul() {
-    return this.x * this.y;
-  }
-
-  logSub() {
-    return this.x - this.y;
-  }
-
-  logDiv() {
-    if (this.y === 0) {
-      throw new Error("Division by zero is incorrect");
+  push(elem) {
+    if (this.stack.length >= this.maxSize) {
+      throw new Error("Stack is full.");
     }
-    return this.x / this.y;
+    this.stack.push(elem);
+  }
+
+  pop() {
+    if (this.isEmpty()) {
+      throw new Error("Pop from empty stack.");
+    }
+    return this.stack.pop();
+  }
+
+  peek() {
+    if (this.isEmpty()) {
+      return null;
+    }
+    return this.stack[this.stack.length - 1];
+  }
+
+  isEmpty() {
+    return this.stack.length === 0;
+  }
+
+  toArray() {
+    return [...this.stack];
+  }
+
+  static fromIterable(iterable) {
+    if (typeof iterable[Symbol.iterator] !== "function") {
+      throw new Error("The provided entity is not iterable.");
+    }
+
+    const newStack = new Stack(iterable.length);
+    for (const elem of iterable) {
+      newStack.push(elem);
+    }
+    return newStack;
   }
 }
-try {
-  const calculator = new Calculator(10, "a");
 
-  const logSumRef = calculator.logSum;
-  console.log(logSumRef());
+const stack = new Stack(5);
+stack.push(1);
+stack.push(2);
+console.log(stack.pop());
+console.log(stack.peek());
+console.log(stack.isEmpty());
+console.log(stack.toArray());
 
-  const logMulRef = calculator.logMul;
-  console.log(logMulRef());
-
-  const logSubRef = calculator.logSub;
-  console.log(logSubRef());
-
-  const logDivRef = calculator.logDiv;
-  console.log(logDivRef());
-
-  calculator.setX(20);
-  calculator.setY(4);
-
-  console.log(logSumRef());
-  console.log(logMulRef());
-  console.log(logSubRef());
-  console.log(logDivRef());
-} catch (error) {
-  console.error(error.message);
-}
+const iterableStack = Stack.fromIterable([3, 4, 5]);
+console.log(iterableStack.toArray());
