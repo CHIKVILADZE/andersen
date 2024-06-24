@@ -207,64 +207,129 @@
 
 // Lecture 5 (OOP in JS)
 
-class Stack {
-  constructor(maxSize = 10) {
-    if (typeof maxSize !== "number" || maxSize <= 0) {
-      throw new Error("Max size must be a positive number.");
-    }
-    this.maxSize = maxSize;
-    this.stack = [];
+// class Stack {
+//   constructor(maxSize = 10) {
+//     if (typeof maxSize !== "number" || maxSize <= 0) {
+//       throw new Error("Max size must be a positive number.");
+//     }
+//     this.maxSize = maxSize;
+//     this.stack = [];
+//   }
+
+//   push(elem) {
+//     if (this.stack.length >= this.maxSize) {
+//       throw new Error("Stack is full.");
+//     }
+//     this.stack.push(elem);
+//   }
+
+//   pop() {
+//     if (this.isEmpty()) {
+//       throw new Error("Pop from empty stack.");
+//     }
+//     return this.stack.pop();
+//   }
+
+//   peek() {
+//     if (this.isEmpty()) {
+//       return null;
+//     }
+//     return this.stack[this.stack.length - 1];
+//   }
+
+//   isEmpty() {
+//     return this.stack.length === 0;
+//   }
+
+//   toArray() {
+//     return [...this.stack];
+//   }
+
+//   static fromIterable(iterable) {
+//     if (typeof iterable[Symbol.iterator] !== "function") {
+//       throw new Error("The provided entity is not iterable.");
+//     }
+
+//     const newStack = new Stack(iterable.length);
+//     for (const elem of iterable) {
+//       newStack.push(elem);
+//     }
+//     return newStack;
+//   }
+// }
+
+// const stack = new Stack(5);
+// stack.push(1);
+// stack.push(2);
+// console.log(stack.pop());
+// console.log(stack.peek());
+// console.log(stack.isEmpty());
+// console.log(stack.toArray());
+
+// const iterableStack = Stack.fromIterable([3, 4, 5]);
+// console.log(iterableStack.toArray());
+
+// Lecture 6 (Asynchrony)
+
+class DataHandler {
+  constructor() {
+    this.posts = new Map();
   }
 
-  push(elem) {
-    if (this.stack.length >= this.maxSize) {
-      throw new Error("Stack is full.");
+  async fetchPosts() {
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts"
+      );
+      const data = await response.json();
+      this.posts.clear();
+      data.forEach((post) => this.posts.set(post.id, post));
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
     }
-    this.stack.push(elem);
   }
 
-  pop() {
-    if (this.isEmpty()) {
-      throw new Error("Pop from empty stack.");
-    }
-    return this.stack.pop();
+  listPosts() {
+    return Array.from(this.posts.values()).sort((a, b) =>
+      a.title.localeCompare(b.title)
+    );
   }
 
-  peek() {
-    if (this.isEmpty()) {
-      return null;
-    }
-    return this.stack[this.stack.length - 1];
+  getPost(id) {
+    return this.posts.get(id);
   }
 
-  isEmpty() {
-    return this.stack.length === 0;
-  }
-
-  toArray() {
-    return [...this.stack];
-  }
-
-  static fromIterable(iterable) {
-    if (typeof iterable[Symbol.iterator] !== "function") {
-      throw new Error("The provided entity is not iterable.");
-    }
-
-    const newStack = new Stack(iterable.length);
-    for (const elem of iterable) {
-      newStack.push(elem);
-    }
-    return newStack;
+  clearPosts() {
+    this.posts.clear();
   }
 }
 
-const stack = new Stack(5);
-stack.push(1);
-stack.push(2);
-console.log(stack.pop());
-console.log(stack.peek());
-console.log(stack.isEmpty());
-console.log(stack.toArray());
+async function main() {
+  const dataHandler = new DataHandler();
 
-const iterableStack = Stack.fromIterable([3, 4, 5]);
-console.log(iterableStack.toArray());
+  try {
+    await dataHandler.fetchPosts();
+    console.log("Posts fetched successfully.");
+
+    console.log("Listing posts:");
+    const posts = dataHandler.listPosts();
+    console.log(posts);
+
+    const postId = 1;
+    console.log(`Getting post with ID ${postId}:`);
+    const post = dataHandler.getPost(postId);
+    console.log(post);
+
+    console.log("DElete posts.");
+    dataHandler.clearPosts();
+
+    console.log("Posts cleared. Current posts:");
+    const clearedPosts = dataHandler.listPosts();
+    console.log(clearedPosts);
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
+}
+
+main();
